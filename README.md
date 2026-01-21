@@ -30,6 +30,8 @@ Frontend: HTML5, CSS3, and Vanilla JavaScript.
 Assets: Custom SVG icons and dot-grid patterns.
 
 How to Install
+DOWNLOAD Get the .zip file containing the complete extension package. 02 UNPACK Extract the files to a local folder. 03 INSTALL Navigate to chrome: / / extensions , enable Developer Mode, and "Load Unpacked"<img width="1636" height="299" alt="image" src="https://github.com/user-attachments/assets/1cdd9742-c326-4e41-88a9-aca2fc437bd7" />
+
 Download the code: Click the green Code button, select Download ZIP, and extract the folder.
 
 Open Extensions page: In your browser, go to chrome://extensions/ (or edge://extensions/).
@@ -41,6 +43,7 @@ Load the project: * Click the Load unpacked button.
 Select the folder containing your manifest.json file.
 
 Done: Open a new tab to see your new dashboard!
+
 
 
 Give me feedback on this link : https://docs.google.com/forms/d/e/1FAIpQLSfM6aDNtFepUSR0Gh5OjPWG_rUgUWMLkkcEFa6c0pLOS369Vw/viewform?usp=publish-editor
