@@ -18,31 +18,28 @@ Quick Dock : A centered app dock for fast navigation to sites like Spotify, YouT
 Customization :
 The extension is built to be flexible to your style. Through the Wallpaper Playground, you can:
 
-Switch Themes: Toggle between deep "Nothing" Black, clean Light mode, and Glassmorphism (blur) effects.
+Switch Themes : Toggle between deep "Nothing" Black, clean Light mode, and Glassmorphism (blur) effects.
 
-Change Backgrounds: Choose between classic solid colors or the iconic dot-matrix patterns.
+Change Backgrounds : Choose between classic solid colors or the iconic dot-matrix patterns.
 
-Personalize Widgets: Adjust the focus of your dashboard, from study-heavy countdowns to minimal aesthetic layouts.
+Personalize Widgets : Adjust the focus of your dashboard, from study-heavy countdowns to minimal aesthetic layouts.
 
-Tech Stack
-Frontend: HTML5, CSS3, and Vanilla JavaScript.
 
-Assets: Custom SVG icons and dot-grid patterns.
 
-How to Install
-DOWNLOAD Get the .zip file containing the complete extension package. 02 UNPACK Extract the files to a local folder. 03 INSTALL Navigate to chrome: / / extensions , enable Developer Mode, and "Load Unpacked"<img width="1636" height="299" alt="image" src="https://github.com/user-attachments/assets/1cdd9742-c326-4e41-88a9-aca2fc437bd7" />
+How to Install :
+<img width="1636" height="299" alt="image" src="https://github.com/user-attachments/assets/1cdd9742-c326-4e41-88a9-aca2fc437bd7" />
 
-Download the code: Click the green Code button, select Download ZIP, and extract the folder.
+Download the Zip : Click the green Code button, select Download ZIP, and extract the folder.
 
-Open Extensions page: In your browser, go to chrome://extensions/ (or edge://extensions/).
+Open Extensions page : In your browser, go to chrome://extensions/ (or edge://extensions/).
 
-Enable Developer Mode: Toggle the switch in the top-right corner to On.
+Enable Developer Mode : Toggle the switch in the top-right corner to On.
 
-Load the project: * Click the Load unpacked button.
+Load the project : * Click the Load unpacked button.
 
 Select the folder containing your manifest.json file.
 
-Done: Open a new tab to see your new dashboard!
+Done : Open a new tab to see your new dashboard!!!
 
 
 
