@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tab Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Nothing Design Language - Minimal Monochrome */
+        :root {
+            --nm-bg: #000000;
+            --nm-surface: #1a1a1a;
+            --nm-surface-hover: #2a2a2a;
+            --nm-border: #333333;
+            --nm-text: #ffffff;
+            --nm-text-secondary: #888888;
+            --nm-accent: #ffffff;
+            --nm-radius: 12px;
+            --nm-font: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .tm-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2147483647;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--nm-font);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .tm-overlay.active {
+            display: flex;
+        }
+
+        .tm-modal {
+            width: 800px;
+            max-width: 95vw;
+            max-height: 85vh;
+            background: var(--nm-bg);
+            border-radius: var(--nm-radius);
+            border: 1px solid var(--nm-border);
+            overflow: hidden;
+            animation: tm-enter 0.2s ease;
+        }
+
+        @keyframes tm-enter {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .tm-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--nm-border);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .tm-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--nm-text);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .tm-search {
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .tm-search input {
+            width: 100%;
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            border-radius: 8px;
+            padding: 10px 16px;
+            color: var(--nm-text);
+            font-size: 13px;
+            font-family: var(--nm-font);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .tm-search input::placeholder {
+            color: var(--nm-text-secondary);
+        }
+
+        .tm-search input:focus {
+            border-color: var(--nm-accent);
+        }
+
+        .tm-close {
+            background: none;
+            border: none;
+            color: var(--nm-text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+            transition: color 0.2s;
+            font-family: var(--nm-font);
+        }
+
+        .tm-close:hover {
+            color: var(--nm-text);
+        }
+
+        .tm-stats {
+            padding: 12px 24px;
+            background: var(--nm-surface);
+            border-bottom: 1px solid var(--nm-border);
+            display: flex;
+            gap: 24px;
+            font-size: 11px;
+            color: var(--nm-text-secondary);
+            font-family: var(--nm-font);
+        }
+
+        .tm-stat {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tm-stat-value {
+            color: var(--nm-text);
+            font-weight: 600;
+        }
+
+        .tm-content {
+            max-height: calc(85vh - 160px);
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .tm-window-group {
+            margin-bottom: 8px;
+        }
+
+        .tm-window-header {
+            padding: 8px 24px;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--nm-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--nm-font);
+            cursor: pointer;
+        }
+
+        .tm-window-header:hover {
+            color: var(--nm-text);
+        }
+
+        .tm-window-count {
+            background: var(--nm-surface);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+        }
+
+        .tm-tab-list {
+            display: flex;
+            flex-direction: column;
+            padding: 0 16px;
+        }
+
+        .tm-tab {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.15s;
+            margin: 2px 0;
+        }
+
+        .tm-tab:hover {
+            background: var(--nm-surface-hover);
+        }
+
+        .tm-tab.active {
+            background: var(--nm-surface-hover);
+        }
+
+        .tm-tab-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            background: var(--nm-surface);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .tm-tab-icon img {
+            width: 14px;
+            height: 14px;
+            border-radius: 2px;
+        }
+
+        .tm-tab-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tm-tab-title {
+            font-size: 12px;
+            color: var(--nm-text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: var(--nm-font);
+        }
+
+        .tm-tab-url {
+            font-size: 10px;
+            color: var(--nm-text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-top: 2px;
+            font-family: var(--nm-font);
+        }
+
+        .tm-tab-actions {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .tm-tab:hover .tm-tab-actions {
+            opacity: 1;
+        }
+
+        .tm-action-btn {
+            background: var(--nm-surface);
+            border: none;
+            color: var(--nm-text-secondary);
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.2s;
+            font-family: var(--nm-font);
+        }
+
+        .tm-action-btn:hover {
+            background: var(--nm-border);
+            color: var(--nm-text);
+        }
+
+        .tm-empty {
+            padding: 60px 24px;
+            text-align: center;
+            color: var(--nm-text-secondary);
+            font-family: var(--nm-font);
+            font-size: 12px;
+        }
+
+        .tm-empty-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .tm-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--nm-border);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .tm-btn {
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            color: var(--nm-text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--nm-font);
+        }
+
+        .tm-btn:hover {
+            background: var(--nm-surface-hover);
+            border-color: var(--nm-text-secondary);
+        }
+
+        .tm-btn.primary {
+            background: var(--nm-text);
+            color: var(--nm-bg);
+            border-color: var(--nm-text);
+        }
+
+        .tm-btn.primary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Scrollbar */
+        .tm-content::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .tm-content::-webkit-scrollbar-track {
+            background: var(--nm-bg);
+        }
+
+        .tm-content::-webkit-scrollbar-thumb {
+            background: var(--nm-border);
+            border-radius: 3px;
+        }
+
+        .tm-content::-webkit-scrollbar-thumb:hover {
+            background: var(--nm-text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="tm-overlay" id="tmOverlay">
+        <div class="tm-modal">
+            <div class="tm-header">
+                <div class="tm-title">Tab Manager</div>
+                <div class="tm-search">
+                    <input type="text" id="tmSearchInput" placeholder="Search tabs..." autocomplete="off">
+                </div>
+                <button class="tm-close" id="tmClose">×</button>
+            </div>
+            <div class="tm-stats">
+                <div class="tm-stat">
+                    <span>Windows:</span>
+                    <span class="tm-stat-value" id="tmWindowCount">0</span>
+                </div>
+                <div class="tm-stat">
+                    <span>Tabs:</span>
+                    <span class="tm-stat-value" id="tmTabCount">0</span>
+                </div>
+                <div class="tm-stat">
+                    <span>Active:</span>
+                    <span class="tm-stat-value" id="tmActiveCount">0</span>
+                </div>
+            </div>
+            <div class="tm-content" id="tmContent">
+                <!-- Tab groups rendered here -->
+            </div>
+            <div class="tm-footer">
+                <button class="tm-btn" id="tmNewWindow">
+                    <span>+</span> New Window
+                </button>
+                <button class="tm-btn" id="tmCloseAll">
+                    <span>×</span> Close All
+                </button>
+                <button class="tm-btn primary" id="tmCollapse">
+                    <span>⊟</span> Collapse
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="tab-manager.js"></script>
+</body>
+</html>
+

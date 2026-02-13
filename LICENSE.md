@@ -1,4 +1,4 @@
-Copyright (c) 2026 [Varshitnunna]
+Copyright (c) 2026 [Oliver Lebaigue & Varshit Nunna]
 
 All Rights Reserved.
 

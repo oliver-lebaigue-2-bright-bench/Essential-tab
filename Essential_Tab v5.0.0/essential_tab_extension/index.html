@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Tab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;800&family=Lexend:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="lib/katex.min.css">
+    <link rel="stylesheet" href="fonts.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Intro Overlay -->
+    <div id="introOverlay" class="intro-overlay">
+        <div class="intro-container">
+            <div class="intro-background-anim"></div>
+            <div class="intro-slide active" data-step="0">
+                <div class="intro-brand">ET</div>
+                <h1 class="intro-title">WELCOME TO<br><span class="text-accent">ESSENTIAL TAB</span> <span class="intro-beta-tag" style="background:#222; color:#fff;">v5.0.0</span></h1>
+                <p class="intro-desc">A minimal, productive, and highly customizable dashboard experience.</p>
+            </div>
+            <div class="intro-slide" data-step="1">
+                <div class="intro-icon">⚡️</div>
+                <h1 class="intro-title">STAY<br>FOCUSED</h1>
+                <p class="intro-desc">Smart widgets, distraction-free modes, and essential tools only when you need them.</p>
+            </div>
+            <div class="intro-slide" data-step="2">
+                <div class="intro-icon">🎨</div>
+                <h1 class="intro-title">MAKE IT<br>YOURS</h1>
+                <p class="intro-desc">Customize layouts, wallpapers, fonts, and more to match your aesthetic.</p>
+            </div>
+            
+            <div class="intro-nav">
+                <div class="intro-indicators">
+                    <div class="intro-dot active"></div>
+                    <div class="intro-dot"></div>
+                    <div class="intro-dot"></div>
+                </div>
+                <button id="introNextBtn" class="intro-action-btn">NEXT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Essential Search Overlay -->
+    <div id="essentialSearchOverlay" class="essential-search-overlay">
+        <div class="essential-search-box">
+            <div class="essential-search-header">
+                <span class="essential-query" id="esQueryDisplay"></span>
+                <div class="essential-branding">
+                    <svg viewBox="0 0 300 300" class="essential-logo-icon">
+                        <path fill="currentColor" d="M91.98068,59.169153l7.067065-5.021545l46.903333,78.784042c3.124999,4.023612,10.089041,3.079154,13.928083,0L199.99204,92.928103l7.799727,7.242603-28.400158,28.090279c-6.88496,6.430843-3.442558,14.251851,4.021844,16.596337h76.415046l-.804369,11.483982h-80.43689c-7.012442-.434553-13.081631,5.385832-9.652427,13.692438l38.609707,70.034521-8.848058,6.434952-43.112192-76.469473c-2.349033-4.365619-6.239713-10.1303-13.69244-4.416916L99.047745,207.577528l-7.067065-6.625374l30.918411-30.918412c6.29957-5.992659,8.509037-13.55046-5.74199-13.692438h-75.970955v-11.483982l86.129862.883383c9.04236.104468,12.219264-6.566534,7.067066-12.809055L91.98068,59.169153Z" />
+                    </svg>
+                    <span class="essential-title">ESSENTIAL SEARCH</span>
+                </div>
+            </div>
+            <div class="essential-content" id="esContent"></div>
+            <div class="essential-footer">
+                <span>POWERED BY GEMINI</span>
+                <button id="closeEsBtn">CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Background (Hidden by default) -->
+    <video id="bgVideo" loop muted playsinline class="bg-video"></video>
+    <div class="background-noise"></div>
+    <div class="overlay" id="overlay"></div>
+    <canvas id="matrixCanvas"></canvas>
+    
+    <!-- Sticker Layer -->
+    <div id="stickerLayer"></div>
+    
+    <!-- Branding -->
+    <div class="brand-logo" id="brandLogo">ESSENTIAL TAB <span style="opacity:0.5">// v5.0.0</span></div>
+
+    <!-- Header Controls -->
+    <div class="header-controls">
+        <button id="morningBriefBtn" class="header-btn" title="Morning Brief">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12,3V4M5.64,5.64l.7.7M3,12H4m1.64,6.36.7-.7M12,21V20m6.36-1.64-.7-.7M21,12H20M18.36,5.64l-.7.7"/><circle cx="12" cy="12" r="4"/></svg>
+        </button>
+        <!-- Snow toggle removed -->
+        <button id="editToggle" class="header-btn edit-toggle-btn" title="Edit Layout">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </button>
+    </div>
+
+    <!-- Context Menu -->
+    <div id="contextMenu" class="context-menu"></div>
+
+    <!-- Essential Note Modal (Revamped) -->
+    <div class="settings-modal wide-modal draggable-window" id="essentialNoteModal">
+        <div class="settings-drag-handle" style="width: 150px; height: 50px; left: 0; top: 0; z-index: 20;"></div>
+        <div class="settings-layout">
+            <!-- Note Sidebar -->
+            <div class="notes-sidebar">
+                <div class="notes-sidebar-header">
+                    <span style="color:var(--accent);">ESSENTIAL NOTES</span>
+                    <button id="addNoteBtn" class="add-note-btn" title="New Note">+</button>
+                </div>
+                <div class="notes-list" id="notesList">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+            
+            <!-- Note Editor -->
+            <div class="notes-editor">
+                <button id="closeNotes" class="btn-icon absolute-close">×</button>
+                <div class="note-editor-header">
+                    <input type="text" id="noteTitleInput" placeholder="Untitled Note" class="note-title-input">
+                    <div class="note-meta" id="noteDateDisplay">Last edited: Today</div>
+                </div>
+                <textarea id="noteContentInput" class="note-content-area" placeholder="Start typing..."></textarea>
+                <div class="note-editor-footer">
+                    <span id="noteWordCount">0 words</span>
+                    <div class="note-footer-actions">
+                        <button id="insertTodoBtn" class="file-upload-btn small-btn">☑ CHECKLIST</button>
+                        <button id="deleteNoteBtn" class="small-danger-btn">DELETE</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Morning Brief Modal -->
+    <div class="brief-overlay" id="briefOverlay">
+        <div class="brief-modal">
+            <div class="brief-header">
+                <div class="flex-center" style="gap:10px;">
+                    <svg class="spinning-sun" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#d71921" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <span>MORNING_BRIEF</span>
+                </div>
+                <button id="closeBrief" class="btn-icon">×</button>
+            </div>
+            <div class="brief-content" id="briefContent">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Library Modal -->
+    <div class="settings-modal" id="libraryModal" style="width: 750px; max-width: 90vw;">
+        <div class="settings-header">
+            <h2>BOOKMARKS_LIBRARY</h2>
+            <button id="closeLibrary" class="btn-icon">×</button>
+        </div>
+        <div class="library-content" id="libraryContent"></div>
+    </div>
+
+    <!-- Changelog Modal -->
+    <div class="settings-modal" id="changelogModal" style="z-index: 3100;">
+        <div class="settings-header">
+            <h2>UPDATE_LOG</h2>
+            <button id="closeChangelog" class="btn-icon">×</button>
+        </div>
+        <div class="settings-content" id="changelogContent"></div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="settings-modal" id="aboutModal" style="z-index: 3100; max-width: 700px; width: 90%;">
+        <div class="settings-header">
+            <h2>ABOUT_EXTENSION</h2>
+            <button id="closeAbout" class="btn-icon">×</button>
+        </div>
+        <div class="settings-content">
+            
+            <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+                <!-- Fun User Card -->
+                <div class="user-card-section" style="flex: 1; min-width: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div class="user-id-card-wrapper">
+                        <div class="user-id-card" id="userIdCard">
+                            <div class="card-glare"></div>
+                            <div class="card-inner-border"></div>
+                            <div class="card-content">
+                                <div class="card-top">
+                                    <div class="card-chip"></div>
+                                    <div class="card-logo-icon">ET</div>
+                                </div>
+                                <div class="card-main">
+                                    <div class="card-avatar-wrapper" id="cardAvatar">
+                                        <!-- Default Stick Man SVG -->
+                                        <div class="default-avatar-icon">
+                                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <div class="card-details">
+                                        <div class="card-label">OPERATOR</div>
+                                        <div class="card-name" id="cardNameDisplay" contenteditable="true" spellcheck="false">USER</div>
+                                        <div class="card-id" id="cardIdDisplay">#0000</div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="card-barcode"></div>
+                                    <span>VALID UNTIL: FOREVER</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Info -->
+                <div style="flex: 1; min-width: 250px;">
+                    <div class="about-header">
+                        <h1 style="font-family:var(--font-display); font-size:1.8rem; font-weight:bold; letter-spacing: -1px; color: white;">ESSENTIAL TAB</h1>
+                        <div class="mono-badge" style="display:inline-block; margin-top:10px;">v5.0.0</div>
+                        <div style="font-family:'Space Mono', monospace; font-size:0.7rem; color:#666; margin-top:5px;">BY OLIVER LEBAIGUE (5.10) & VARSHIT NUNNA</div>
+                    </div>
+                    
+                    <div class="about-list" style="margin-top: 20px;">
+                        <span>• Smart Clock & Greeting</span>
+                        <span>• Weather Integration</span>
+                        <span>• Interactive Calendar</span>
+                        <span>• Multi-Engine Search</span>
+                        <span>• Universal Media Control</span>
+                    </div>
+                    
+                    <div style="text-align:center; margin-top:30px; font-size:0.7rem; color:#444; font-family:var(--font-display);">
+                        DESIGNED FOR FOCUS.<br>BUILT FOR PERFORMANCE.
+                    </div>
+
+                    <!-- Social Buttons -->
+                    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+                        <a href="https://x.com/NunnaVarshit" target="_blank" style="width:36px; height:36px; background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.transform='scale(1)'">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                        </a>
+                        <a href="https://github.com/varshitnunna/Essential-tab" target="_blank" style="width:36px; height:36px; background:rgba(255,255,255,0.05); border:1px solid #333; border-radius:12px; display:flex; align-items:center; justify-content:center; color:#fff; transition:all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'; this.style.transform='scale(1)'">
+                             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal (Draggable Window Layout) -->
+    <div class="settings-modal wide-modal draggable-window" id="settingsModal">
+        <!-- Draggable Handle Area -->
+        <div class="settings-drag-handle"></div>
+        
+        <div class="settings-layout">
+            <!-- Sidebar -->
+            <div class="settings-sidebar">
+                <div class="settings-search-wrapper">
+                    <input type="text" id="settingsSearch" placeholder="SEARCH SETTINGS" class="settings-search-input">
+                </div>
+                <div class="settings-sidebar-header">PREFERENCES</div>
+                <button class="settings-tab active" data-target="tab-appearance">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+                    APPEARANCE
+                </button>
+                <button class="settings-tab" data-target="tab-widgets">
+                    <svg width="16" height="16" viewBox="0 0 18 18" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <g fill-rule="evenodd">
+                            <rect rx="2" width="8" height="12" />
+                            <rect y="14" rx="2" width="8" height="4"/>
+                            <rect x="10" rx="2" width="8" height="7"/>
+                            <rect x="10" y="9" rx="2" width="8" height="9" />
+                        </g>
+                    </svg>
+                    WIDGETS
+                </button>
+                <button class="settings-tab" data-target="tab-dock">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="19" width="20" height="3" rx="1.5"/></svg>
+                    DOCK
+                </button>
+                <button class="settings-tab" data-target="tab-apps">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    APPS
+                </button>
+                <button class="settings-tab" data-target="tab-brief">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12,3V4M5.64,5.64l.7.7M3,12H4m1.64,6.36.7-.7M12,21V20m6.36-1.64-.7-.7M21,12H20M18.36,5.64l-.7.7"/><circle cx="12" cy="12" r="4"/></svg>
+                    BRIEF
+                </button>
+                <button class="settings-tab" data-target="tab-experimental">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v15h6V3"/><path d="M3 10h18"/><path d="M21 21H3"/></svg>
+                    EXPERIMENTAL
+                </button>
+                <div style="flex-grow:1"></div>
+                <button class="settings-tab" data-target="tab-system">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    SYSTEM
+                </button>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="settings-main">
+                <button id="closeSettings" class="btn-icon absolute-close">×</button>
+                
+                <!-- APPEARANCE TAB -->
+                <div id="tab-appearance" class="settings-pane active">
+                    <div class="setting-section">
+                        <div class="section-title">WALLPAPER PLAYGROUND</div>
+                        <!-- Large Preview -->
+                        <div class="wallpaper-large-preview" id="wpLargePreview">
+                            <div class="wp-current-label">CURRENT</div>
+                        </div>
+                        
+                        <!-- Tabs -->
+                        <div class="wallpaper-tabs">
+                            <button class="wp-tab active" data-target="wp-images">IMAGES</button>
+                            <button class="wp-tab" data-target="wp-patterns">PATTERNS</button>
+                            <button class="wp-tab" data-target="wp-gradients">GRADIENTS</button>
+                        </div>
+
+                        <!-- Wallpaper List View -->
+                        <div id="wp-images" class="wp-view active">
+                            <div class="wallpaper-list-container" id="wallpaperList">
+                                <!-- Populated via JS -->
+                            </div>
+                            <input type="file" id="bgUpload" accept="image/*,video/*" hidden>
+                        </div>
+
+                        <!-- Emoji Generator View -->
+                        <div id="wp-patterns" class="wp-view">
+                            <div class="emoji-generator-wrapper">
+                                <div class="section-title" style="margin-bottom: 0;">EMOJI LAB <span class="mono-badge">BETA</span></div>
+                                <div class="emoji-controls-grid">
+                                    <input type="text" id="emojiInput" value="⚡️✨" class="emoji-input-styled" placeholder="Enter Emojis">
+                                    <input type="color" id="emojiBgInput" value="#000000" class="emoji-color-picker">
+                                </div>
+                                <div class="setting-row column" style="gap:4px; margin:0;">
+                                    <span style="font-size:0.65rem; font-weight:bold; color:#555; text-transform:uppercase;">Pattern Style</span>
+                                    <select id="emojiLayoutSelect" class="emoji-select-styled">
+                                        <option value="grid-medium">Regular Grid</option>
+                                        <option value="grid-small">Dense Grid</option>
+                                        <option value="grid-large">Sparse Grid</option>
+                                        <option value="radial">Radial Burst</option>
+                                    </select>
+                                </div>
+                                <button id="emojiGenerateBtn" class="emoji-gen-btn">Generate Wallpaper</button>
+                                <div style="font-size:0.65rem; color:#666; text-align:center; margin-top:5px;">Note: It may take time to generate the wallpaper.</div>
+                            </div>
+                        </div>
+
+                        <!-- Gradient Generator View -->
+                        <div id="wp-gradients" class="wp-view">
+                            <div class="emoji-generator-wrapper">
+                                <div class="section-title" style="margin-bottom: 0;">GRADIENT LAB <span class="mono-badge">BETA</span></div>
+                                <div class="setting-row column" style="gap:4px; margin-top:10px;">
+                                    <span style="font-size:0.65rem; font-weight:bold; color:#555; text-transform:uppercase;">Type</span>
+                                    <select id="gradTypeSelect" class="emoji-select-styled">
+                                        <option value="linear">Linear</option>
+                                        <option value="radial">Radial</option>
+                                    </select>
+                                </div>
+                                <div class="setting-row column" id="gradAngleRow" style="gap:4px; margin:0;">
+                                    <span style="font-size:0.65rem; font-weight:bold; color:#555; text-transform:uppercase;">Angle: <span id="gradAngleVal">45</span>°</span>
+                                    <input type="range" id="gradAngleInput" min="0" max="360" value="45" class="range-slider">
+                                </div>
+                                <div class="setting-row column" style="gap:4px; margin:0;">
+                                    <div style="display:flex; justify-content:space-between; width:100%;">
+                                        <span style="font-size:0.65rem; font-weight:bold; color:#555; text-transform:uppercase;">Colors</span>
+                                        <button id="addGradColorBtn" class="tiny-btn" style="padding:2px 6px;">+ ADD</button>
+                                    </div>
+                                    <div id="gradColorsList" style="display:flex; gap:8px; width:100%; overflow-x:auto; padding-bottom:5px;">
+                                        <!-- Injected via JS -->
+                                    </div>
+                                </div>
+                                <button id="gradGenerateBtn" class="emoji-gen-btn">Generate Wallpaper</button>
+                                <div style="font-size:0.65rem; color:#666; text-align:center; margin-top:5px;">Note: It may take time to generate the wallpaper.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="setting-section">
+                        <div class="section-title">THEME & VISUALS</div>
+                        <div class="setting-row column">
+                            <span class="setting-label">THEME</span>
+                            <div class="pill-container" id="themePill">
+                                 <div class="pill-slider"></div>
+                                 <button class="pill-btn" data-value="light">LIGHT</button>
+                                 <button class="pill-btn" data-value="dark">DARK</button>
+                                 <button class="pill-btn" data-value="glass">GLASS</button>
+                            </div>
+                        </div>
+                        <div class="setting-row column hidden" id="fontRow">
+                            <span class="setting-label">FONT FAMILY</span>
+                            <div class="pill-container" id="fontPill">
+                                 <div class="pill-slider"></div>
+                                 <button class="pill-btn" data-value="Inter">INTER</button>
+                                 <button class="pill-btn" data-value="Space Mono">MONO</button>
+                                 <button class="pill-btn" data-value="Lexend">BOLD</button>
+                                 <button class="pill-btn" data-value="VT323">RETRO</button>
+                            </div>
+                        </div>
+                        <div class="setting-row">
+                            <span class="setting-label">BLUR INTENSITY</span>
+                            <input type="range" id="blurRange" min="0" max="50" value="24" class="range-slider">
+                        </div>
+                        <div class="setting-row">
+                            <span class="setting-label">BORDER RADIUS: <span id="borderRadiusVal">20</span>px</span>
+                            <input type="range" id="borderRadiusRange" min="0" max="50" value="20" class="range-slider">
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="setting-section">
+                        <div class="section-title">LAYOUT</div>
+                        <div class="setting-row column">
+                            <span class="setting-label">GRID ALIGNMENT</span>
+                            <div class="pill-container" id="layoutPill">
+                                 <div class="pill-slider"></div>
+                                 <button class="pill-btn" data-value="left">LEFT</button>
+                                 <button class="pill-btn" data-value="center">CENTER</button>
+                                 <button class="pill-btn" data-value="right">RIGHT</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WIDGETS TAB -->
+                <div id="tab-widgets" class="settings-pane">
+                    
+                    <div class="setting-section">
+                        <div class="section-title">IDENTITY</div>
+                        <div class="setting-row">
+                             <span class="setting-label">GREETING NAME</span>
+                             <input type="text" id="userNameInput" placeholder="USER" class="text-input" style="width: 140px;">
+                        </div>
+                    </div>
+                    
+                    <div class="divider"></div>
+
+                    <div class="setting-section">
+                        <div class="section-title">CLOCK WIDGET</div>
+                        <div class="setting-row">
+                            <span class="setting-label">24-HOUR FORMAT</span>
+                            <label class="switch">
+                                <input type="checkbox" id="format24h">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <span class="setting-label">SHOW SECONDS</span>
+                            <label class="switch">
+                                <input type="checkbox" id="showSeconds">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="setting-section">
+                        <div class="section-title">WEATHER WIDGET</div>
+                        <div class="setting-row">
+                            <span class="setting-label">SHOW DATE ON TOP RIGHT</span>
+                            <label class="switch">
+                                <input type="checkbox" id="weatherDateToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="setting-section">
+                        <div class="section-title">COUNTDOWN</div>
+                        <div class="setting-row column">
+                            <input type="text" id="countdownLabelInput" placeholder="Event Name (e.g. Vacation)" class="text-input" style="margin-bottom: 5px;">
+                            <div class="flex-row-center" style="display:flex; gap:10px; width:100%">
+                                <input type="date" id="countdownDateInput" class="text-input" style="flex:1;">
+                                <button id="saveCountdownBtn" class="file-upload-btn small-btn">SAVE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DOCK TAB (NEW) -->
+                <div id="tab-dock" class="settings-pane">
+                    <div class="setting-section">
+                        <div class="section-title">DOCK PREFERENCES</div>
+                        <div class="setting-row">
+                            <span class="setting-label">SHOW DOCK</span>
+                            <label class="switch">
+                                <input type="checkbox" id="dockToggle" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <span class="setting-label">AUTO-HIDE (FOCUS MODE)</span>
+                            <label class="switch">
+                                <input type="checkbox" id="dockAutoHide">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row">
+                            <span class="setting-label">SCALE</span>
+                            <input type="range" id="dockScaleRange" min="0.5" max="1.5" step="0.1" value="1" class="range-slider" style="width: 100px;">
+                        </div>
+                        <div class="setting-row hidden" id="dockMagRow">
+                            <span class="setting-label">MAGNIFICATION STRENGTH</span>
+                            <input type="range" id="dockMagRange" min="0.2" max="1.5" step="0.1" value="0.75" class="range-slider" style="width: 100px;">
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="setting-section">
+                        <div class="section-title">DOCK ITEMS</div>
+                        <div class="setting-row column">
+                            <div id="dockSettingsList" class="dock-settings-list"></div>
+                            <div class="dock-add-wrapper" style="margin-top: 10px;">
+                                <input type="text" id="dockTitleInput" placeholder="Name" class="text-input small">
+                                <input type="text" id="dockUrlInput" placeholder="URL" class="text-input small">
+                                <button id="addDockBtn" class="file-upload-btn small-btn">ADD</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- APPS TAB (NEW) -->
+                <div id="tab-apps" class="settings-pane">
+                    <div class="setting-section">
+                        <div class="section-title">LIBRARY (BOOKMARKS)</div>
+                        <div class="setting-row column">
+                             <span class="setting-label">SORT ORDER</span>
+                             <div class="pill-container" id="bookmarkOrderPill">
+                                 <div class="pill-slider"></div>
+                                 <button class="pill-btn" data-value="newest">NEWEST</button>
+                                 <button class="pill-btn" data-value="oldest">OLDEST</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="setting-section">
+                        <div class="section-title">NOTES DATA</div>
+                        <div class="setting-row" style="gap: 10px;">
+                             <button id="backupNotesBtn" class="file-upload-btn small-btn" style="flex:1; text-align:center;">BACKUP NOTES</button>
+                             <button id="importNotesBtn" class="file-upload-btn small-btn" style="flex:1; text-align:center;">IMPORT NOTES</button>
+                             <input type="file" id="importNotesInput" accept=".json" hidden>
+                        </div>
+                        <div class="setting-row" style="margin-top: 10px;">
+                             <button id="resetNotesBtn" class="danger-btn">RESET ALL NOTES</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BRIEF TAB -->
+                <div id="tab-brief" class="settings-pane">
+                    <div class="setting-section">
+                        <div class="section-title" style="color: #ff4444;">MORNING BRIEF</div>
+                        <div class="setting-row">
+                            <span class="setting-label">AUTO-SHOW DAILY</span>
+                            <label class="switch">
+                                <input type="checkbox" id="briefAutoShow">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row column" style="margin-bottom: 20px;">
+                             <span class="setting-label">NEWS TOPIC</span>
+                             <select id="briefNewsTopic" class="text-input small" style="width: 100%;">
+                                 <option value="tech">TECHNOLOGY</option>
+                                 <option value="business">BUSINESS</option>
+                                 <option value="science">SCIENCE</option>
+                                 <option value="design">DESIGN</option>
+                             </select>
+                        </div>
+                        <div class="setting-row column" style="margin-bottom: 20px;">
+                             <span class="setting-label">BUTTON LOCATION</span>
+                             <div class="pill-container" id="briefLocationPill">
+                                 <div class="pill-slider"></div>
+                                 <button class="pill-btn" data-value="homepage">HOMEPAGE</button>
+                                 <button class="pill-btn" data-value="dock">DOCK</button>
+                                 <button class="pill-btn" data-value="none">NONE</button>
+                            </div>
+                        </div>
+                        
+                        <div class="section-title">SECTIONS ORDER</div>
+                        <div id="briefOrderList" class="dock-settings-list" style="max-height: 300px;">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- EXPERIMENTAL TAB -->
+                <div id="tab-experimental" class="settings-pane">
+                    <div class="setting-section">
+                        <div class="section-title" style="color: #ff4444;">EXPERIMENTAL</div>
+                        <div class="setting-row column" style="margin-bottom: 20px;">
+                            <span class="text-xs text-[#888]" style="font-family:var(--font-ui); color: var(--accent); font-size: 0.7rem; letter-spacing: 0.5px;">NOTE: These features are experimental and might or might not work on all devices.</span>
+                        </div>
+                        
+                        <div class="setting-section">
+                            <div class="section-title">ESSENTIAL AI</div>
+                            <div class="setting-row column">
+                                <span class="setting-label">GEMINI API KEY</span>
+                                <input type="password" id="geminiKeyInput" placeholder="Enter API Key" class="text-input small">
+                                <div style="margin-top:5px; font-size:0.65rem; color:#666;">
+                                    Need a key? <a href="https://aistudiocdn.com/app/apikey" target="_blank" style="color:var(--accent); text-decoration:underline;">Get one here</a> (Free tier available).
+                                </div>
+                            </div>
+                            <div class="setting-row column" style="margin-top: 15px;">
+                                 <span class="setting-label">MODEL</span>
+                                 <div class="pill-container" id="aiModelPill">
+                                     <div class="pill-slider"></div>
+                                     <button class="pill-btn" data-value="flash-lite">FLASH LITE</button>
+                                     <button class="pill-btn" data-value="flash">FLASH</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <div class="setting-row">
+                            <span class="setting-label">ENABLE EXPERIMENTS</span>
+                            <label class="switch">
+                                <input type="checkbox" id="experimentalToggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        
+                        <div id="experimentalControls">
+                            <div class="setting-row hidden" id="ambientRow">
+                                <span class="setting-label">AMBIENT LIGHTING</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="ambientToggle">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-row hidden" id="albumGlowRow">
+                                <span class="setting-label">DYNAMIC ALBUM GLOW</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="albumGlowToggle">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-row hidden" id="emojiIconsRow">
+                                <span class="setting-label">EMOJI ICONS</span>
+                                <label class="switch">
+                                    <input type="checkbox" id="emojiIconsToggle">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-row hidden" id="coverSizeRow">
+                                <span class="setting-label">COVER ART SIZE</span>
+                                <input type="range" id="coverSizeRange" min="80" max="180" step="10" value="110" class="range-slider">
+                            </div>
+
+                            <div class="setting-row column hidden" id="experimentalCodeRow">
+                                <span class="setting-label" style="margin-bottom:8px">DEVELOPER CODE</span>
+                                <input type="text" id="experimentalCodeInput" placeholder="ENTER CODE" class="text-input small">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SYSTEM TAB -->
+                <div id="tab-system" class="settings-pane">
+                    <div class="setting-section">
+                         <div class="section-title">INFORMATION</div>
+                         <div class="system-info-row">
+                            <span class="setting-label">CURRENT VERSION</span>
+                            <span class="mono-badge" id="versionLabel" style="cursor: pointer;">v5.0.0</span>
+                        </div>
+                         <div style="display:flex; gap:10px; margin-top:20px;">
+                            <button id="openAboutBtn" class="file-upload-btn small-btn" style="flex:1;">ABOUT</button>
+                            <button id="openChangelogBtn" class="file-upload-btn small-btn" style="flex:1;">HISTORY</button>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="setting-section">
+                        <div class="section-title">DATA MANAGEMENT</div>
+                        <div class="setting-row" style="gap: 10px;">
+                             <button id="backupDataBtn" class="file-upload-btn small-btn" style="flex:1; text-align:center;">BACKUP USER DATA</button>
+                             <button id="importDataBtn" class="file-upload-btn small-btn" style="flex:1; text-align:center;">IMPORT USER DATA</button>
+                             <input type="file" id="importDataInput" accept=".json" hidden>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="setting-section">
+                        <div class="section-title">MAINTENANCE</div>
+                        <div class="setting-row column" style="gap: 10px;">
+                             <button id="resetWidgetsBtn" class="danger-btn">RESET WIDGET LAYOUT</button>
+                             <button id="resetAllBtn" class="danger-btn">FACTORY RESET EXTENSION</button>
+                             <button id="removeAllStickersBtn" class="danger-btn">CLEAR ALL STICKERS</button>
+                        </div>
+                    </div>
+                    <div class="divider"></div>
+                    <div class="setting-section">
+                        <div class="section-title">COMMUNITY</div>
+                        <div class="setting-row" style="gap: 10px;">
+                             <button id="btnFeedback" class="file-upload-btn small-btn" style="flex:1; text-align:center;">GIVE FEEDBACK</button>
+                             <button id="btnBugReport" class="file-upload-btn small-btn" style="flex:1; text-align:center;">REPORT A BUG</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Wrapper for Grid and Sidebar -->
+    <div id="contentWrapper">
+        <main class="grid-container" id="gridContainer">
+            
+            <!-- Clock Card -->
+            <div class="card clock-card widget" id="widget-clock" draggable="false">
+                <button class="remove-btn"><div class="remove-icon"></div></button>
+                
+                <div class="red-accent top-right interactive-accent" id="clockRedDot"></div>
+                <div class="greeting-container">
+                    <h3 id="greetingText">GOOD MORNING</h3>
+                    <h2 id="userNameDisplay">USER</h2>
+                </div>
+                <div class="clock-content">
+                    <h1 id="clockTime">00:00</h1>
+                    <div id="clockDateFull" class="hidden text-sm font-mono opacity-60 mt-2">SATURDAY, DEC 06</div>
+                </div>
+            </div>
+
+            <!-- Stacked Widget -->
+            <div class="card stack-card widget" id="widget-stack" draggable="false">
+                <button class="remove-btn"><div class="remove-icon"></div></button>
+                <div class="stack-nav">
+                    <button id="prevStack" class="nav-arrow">‹</button>
+                    <div class="stack-dots" id="stackDots"></div>
+                    <button id="nextStack" class="nav-arrow">›</button>
+                </div>
+                <!-- Weather -->
+                <div class="stack-view active" id="view-weather">
+                    <div class="widget-label">WEATHER <span id="weatherDate" class="hidden" style="font-family:var(--font-ui); font-size:0.65rem; opacity:0.7; letter-spacing: 0;"></span></div>
+                    <div class="weather-layout">
+                        <div class="weather-detail"><span id="weatherDesc">SCANNING...</span></div>
+                        <div class="weather-main"><span id="weatherTemp">--°</span></div>
+                    </div>
+                </div>
+                <!-- Music -->
+                <div class="stack-view" id="view-music">
+                    <div class="widget-label">NOW PLAYING <button id="sourceIconBtn" class="source-icon hidden"><img id="sourceFavicon" src=""></button></div>
+                    <div class="music-layout">
+                        <div class="album-art-container" id="musicIcon">
+                            <img id="musicArt" src="" alt="Art">
+                            <div class="empty-art-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                            </div>
+                        </div>
+                        <div class="track-details">
+                            <div class="track-info">
+                                <span class="track-title" id="musicTitle">No Audio</span>
+                                <span class="track-artist" id="musicArtist">Start media</span>
+                            </div>
+                            
+                            <!-- Progress Section -->
+                            <div class="progress-section">
+                                <div class="progress-bar-container" id="musicProgressBar">
+                                    <div class="progress-bar-fill" id="musicProgressFill"></div>
+                                </div>
+                                <div class="time-row">
+                                    <span class="time-text" id="musicTimeCurrent">0:00</span>
+                                    <span class="time-text" id="musicTimeTotal">0:00</span>
+                                </div>
+                            </div>
+                            
+                            <div class="media-controls">
+                                <button id="btnPrev" class="media-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                                <button id="btnPlayPause" class="media-btn play-btn"><svg id="iconPlay" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg id="iconPause" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                                <button id="btnNext" class="media-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Calendar -->
+                <div class="stack-view" id="view-calendar">
+                    <div class="widget-label">CALENDAR <button id="calToggleView" class="tiny-btn">MONTH</button></div>
+                    <div class="calendar-layout" id="calSimpleView">
+                        <div class="cal-day" id="calDay">SUN</div>
+                        <div class="cal-date" id="calDate">1</div>
+                    </div>
+                    <div class="cal-month-view hidden" id="calMonthView">
+                        <div class="month-header" id="calMonthName">JANUARY</div>
+                        <div class="cal-grid-labels"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+                        <div class="cal-grid" id="calGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-container widget" id="widget-search" draggable="false">
+                <div class="custom-select" id="searchSelect">
+                    <div class="selected-option">
+                        <div id="currentEngineIconContainer" class="flex-center"></div> 
+                        <span class="chevron">▼</span>
+                    </div>
+                    <div class="options-list" id="engineOptions"></div>
+                </div>
+                <input type="text" id="searchInput" placeholder="Type to search..." autocomplete="off">
+                <button id="searchSubmit" class="search-submit-btn">
+                    <svg viewBox="0 0 50 50" width="20" height="20"><path fill="currentColor" d="M35.66 29.539c1.661-2.739 2.632-5.948 2.632-5.948 0-10.029-8.115-18.15-18.146-18.154-10.022.003-18.146 8.125-18.146 18.152 0 10.018 8.125 18.139 18.152 18.139 3.44 0 6.645-.972 9.384-2.633l12.343 12.342 6.121-6.124-12.34-12.337zm-15.51 1.841c-6.202-.015-11.216-5.027-11.216-11.216.012-6.202 5.027-11.215 11.227-11.229 6.199.016 11.215 5.028 11.228 11.229-.013 6.182-5.031 11.201-11.228 11.216z"/></svg>
+                </button>
+                <div id="searchSuggestions" class="suggestions-list"></div>
+                <div id="searchResizeHandle" class="search-resize-handle hidden"></div>
+            </div>
+
+            <!-- To-Do Widget -->
+            <div class="card todo-card widget" id="widget-todo" draggable="false">
+                <button class="remove-btn"><div class="remove-icon"></div></button>
+                <div class="card-header"><span>TASKS</span><div class="red-accent-dot interactive-accent"></div></div>
+                <div class="todo-wrapper">
+                    <div class="todo-input-row">
+                        <input type="text" id="todoInput" class="todo-input" placeholder="Add task...">
+                        <button id="todoAddBtn" class="tiny-btn">+</button>
+                    </div>
+                    <div class="list-container" id="todoList"></div>
+                </div>
+            </div>
+
+            <!-- Recents -->
+            <div class="card recents-card widget" id="widget-recents" draggable="false">
+                <button class="remove-btn"><div class="remove-icon"></div></button>
+                <div class="card-header"><span>RECENT TABS</span><div class="red-accent-dot interactive-accent"></div></div>
+                <div class="list-container" id="recentsList"></div>
+            </div>
+
+        </main>
+
+        <!-- Sidebar (Visible only in left/right mode) -->
+        <div id="sidebarContainer" class="sidebar-container hidden">
+            <div id="sidebarPlaceholder" class="sidebar-placeholder">
+                <div class="plus-icon">+</div>
+                <span>EXPANDED WIDGET</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Widget Drawer (Storage) -->
+    <div class="widget-drawer" id="widgetDrawer">
+        <div class="drawer-header">
+            <div class="tab-switcher">
+                <button class="tab-btn active" data-tab="widgets">WIDGETS</button>
+                <button class="tab-btn" data-tab="stickers">STICKERS <span class="beta-tag">BETA</span></button>
+            </div>
+            <div class="drawer-controls">
+                <button id="minimizeDrawer" class="btn-icon" title="Minimize">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <button id="closeDrawer" class="btn-icon">×</button>
+            </div>
+        </div>
+        
+        <!-- Widgets View -->
+        <div class="drawer-content drawer-view active" id="drawerContent">
+            <!-- Notes Widget -->
+            <div class="card notes-card widget hidden" id="widget-notes" draggable="false">
+                <button class="remove-btn"><div class="remove-icon"></div></button>
+                <div class="card-header"><span>NOTES</span><div class="red-accent-dot interactive-accent"></div></div>
+                <textarea id="widgetNotesInput" class="notes-textarea" placeholder="Quick note..."></textarea>
+            </div>
+            <!-- Bookmarks -->
+            <div class="card bookmarks-card widget hidden" id="widget-bookmarks" draggable="false">
+                    <button class="remove-btn"><div class="remove-icon"></div></button>
+                <div class="card-header"><span>QUICK LINKS</span><div class="red-accent-dot interactive-accent"></div></div>
+                <div class="list-container" id="bookmarksList"></div>
+            </div>
+            <!-- Countdown -->
+            <div class="card countdown-card widget hidden" id="widget-countdown" draggable="false">
+                <button class="remove-btn"><div class="remove-icon"></div></button>
+                <div class="countdown-layout">
+                    <div class="hourglass-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+                            <polygon points="5 3 19 3 12 11 5 3" />
+                            <polygon points="5 21 19 21 12 13 5 21" />
+                        </svg>
+                    </div>
+                    <div class="countdown-info">
+                        <span id="countdownLabel" class="countdown-label">EVENT</span>
+                        <span id="countdownTime" class="countdown-time">-- DAYS</span>
+                    </div>
+                </div>
+                <div class="countdown-bar"><div class="countdown-fill" id="countdownFill"></div></div>
+            </div>
+            <!-- Standalone Music Widget -->
+            <div class="card music-card widget hidden" id="widget-music" draggable="false">
+                <button class="remove-btn"><div class="remove-icon"></div></button>
+                
+                <div class="widget-label" style="width:100%; margin-bottom: 8px;">NOW PLAYING <div class="red-accent-dot"></div></div>
+                <div class="music-layout">
+                    
+                    <div class="album-art-container" id="musicIcon_sa">
+                        <img id="musicArt_sa" src="" alt="Art">
+                        <div class="empty-art-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                        </div>
+                    </div>
+                    <div class="track-details">
+                        <div class="track-info">
+                            <span class="track-title" id="musicTitle_sa">No Audio</span>
+                            <span class="track-artist" id="musicArtist_sa">Start media</span>
+                        </div>
+                        
+                        <!-- Progress Section -->
+                        <div class="progress-section">
+                            <div class="progress-bar-container" id="musicProgressBar_sa">
+                                <div class="progress-bar-fill" id="musicProgressFill_sa"></div>
+                            </div>
+                            <div class="time-row">
+                                <span class="time-text" id="musicTimeCurrent_sa">0:00</span>
+                                <span class="time-text" id="musicTimeTotal_sa">0:00</span>
+                            </div>
+                        </div>
+
+                        <!-- 5-Button Row: Shuffle | Prev | Play | Next | Repeat -->
+                        <div class="media-controls-row">
+                             <button id="btnShuffle_sa" class="media-btn small-btn spotify-control" title="Shuffle"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg></button>
+                             <div class="main-controls-group">
+                                <button id="btnPrev_sa" class="media-btn"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg></button>
+                                <button id="btnPlayPause_sa" class="media-btn play-btn"><svg id="iconPlay_sa" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg id="iconPause_sa" viewBox="0 0 24 24" width="24" height="24" fill="currentColor" class="hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>
+                                <button id="btnNext_sa" class="media-btn"><svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg></button>
+                             </div>
+                             <button id="btnRepeat_sa" class="media-btn small-btn spotify-control" title="Repeat"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg></button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stickers View -->
+        <div class="drawer-view" id="stickerContent" style="overflow-y: auto; padding: 20px 40px 10px 40px;">
+            <div class="sticker-grid" id="stickerLibrary">
+                <!-- Custom Upload -->
+                <div class="sticker-item upload-btn">
+                    <label for="stickerUpload" style="cursor:pointer; width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:2rem;">+</label>
+                    <input type="file" id="stickerUpload" accept="image/*" hidden>
+                </div>
+                <div id="customStickerContainer" style="display:contents;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Restore Drawer Button -->
+    <button id="restoreDrawerBtn" class="restore-drawer-btn hidden">OPEN LIBRARY</button>
+
+    <!-- Drop Zone for Store -->
+    <div id="dropZone" class="drop-zone">
+        STORE WIDGET
+    </div>
+
+    <!-- Dock -->
+    <div class="dock-container" id="dockContainer">
+        <div class="dock" id="dock"></div>
+    </div>
+
+    <script src="lib/katex.min.js"></script>
+    <script src="lib/auto-render.min.js"></script>
+    <script src="script.js"></script>
+    
+</body>
+</html>

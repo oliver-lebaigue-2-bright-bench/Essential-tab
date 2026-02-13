@@ -1,0 +1,110 @@
+{
+  "manifest_version": 3,
+  "name": "Essential Tab",
+  "version": "5.1.0",
+  "description": "A minimal, productive, and highly customizable dashboard with browser-wide features.",
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "bookmarks",
+    "topSites",
+    "history",
+    "scripting",
+    "tabs",
+    "activeTab",
+    "sessions",
+    "tabGroups",
+    "clipboardRead",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_icon": "icon48.png",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content-script.js"
+      ],
+      "css": [
+        "content-styles.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+"commands": {
+    "toggle-command-palette": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+K",
+        "mac": "Command+Shift+K"
+      },
+      "description": "Open Command Palette"
+    },
+    "toggle-dark-mode": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+D",
+        "mac": "Command+Shift+D"
+      },
+      "description": "Toggle Browser Dark Mode"
+    },
+    "toggle-reading-mode": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+R",
+        "mac": "Command+Shift+R"
+      },
+      "description": "Toggle Reading Mode"
+    },
+    "open-tab-manager": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+T",
+        "mac": "Command+Shift+T"
+      },
+      "description": "Open Tab Manager"
+    }
+}
+  ,
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "index.html",
+        "tab-manager.html",
+        "tab-manager.js",
+        "sessions.html",
+        "sessions.js",
+        "popup.html",
+        "popup.js",
+        "lib/NDOT.otf",
+        "lib/NTYPE.otf",
+        "widgets/calculator.html",
+        "widgets/calculator.js",
+        "widgets/quotes.html",
+        "widgets/quotes.js",
+        "widgets/clipboard.html",
+        "widgets/clipboard.js",
+        "widgets/dictionary.html",
+        "widgets/dictionary.js",
+        "widgets/qrcode.html",
+        "widgets/qrcode.js",
+        "widgets/system.html",
+        "widgets/system.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

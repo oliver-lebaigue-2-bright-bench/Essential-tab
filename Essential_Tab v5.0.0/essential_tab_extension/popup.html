@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Essential Tab</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Nothing Design Language - Minimal Monochrome */
+        :root {
+            --nm-bg: #000000;
+            --nm-surface: #1a1a1a;
+            --nm-surface-hover: #2a2a2a;
+            --nm-border: #333333;
+            --nm-text: #ffffff;
+            --nm-text-secondary: #888888;
+            --nm-accent: #ffffff;
+            --nm-radius: 12px;
+            --nm-font: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 280px;
+            min-height: 180px;
+            background: var(--nm-bg);
+            color: var(--nm-text);
+            font-family: var(--nm-font);
+            padding: 16px;
+        }
+
+        .popup-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--nm-border);
+        }
+
+        .popup-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--nm-text);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .popup-version {
+            font-size: 10px;
+            color: var(--nm-text-secondary);
+        }
+
+        .popup-section {
+            margin-bottom: 16px;
+        }
+
+        .popup-section-title {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--nm-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+
+        .feature-btn {
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            border-radius: var(--nm-radius);
+            padding: 12px 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .feature-btn:hover {
+            background: var(--nm-surface-hover);
+            border-color: var(--nm-text-secondary);
+        }
+
+        .feature-btn.active {
+            background: var(--nm-surface);
+            border-color: var(--nm-text);
+        }
+
+        .feature-btn.active .feature-icon {
+            color: var(--nm-text);
+        }
+
+        .feature-icon {
+            font-size: 18px;
+        }
+
+        .feature-label {
+            font-size: 10px;
+            color: var(--nm-text);
+        }
+
+        .feature-shortcut {
+            font-size: 9px;
+            color: var(--nm-text-secondary);
+            margin-top: 2px;
+            font-family: var(--nm-font);
+        }
+
+        .slider-section {
+            background: var(--nm-surface);
+            border-radius: var(--nm-radius);
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .slider-label {
+            font-size: 10px;
+            color: var(--nm-text);
+        }
+
+        .slider-value {
+            font-size: 10px;
+            color: var(--nm-text-secondary);
+            font-family: var(--nm-font);
+        }
+
+        .slider {
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--nm-border);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--nm-text);
+            cursor: pointer;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--nm-border);
+            margin: 12px 0;
+        }
+
+        .action-btn {
+            width: 100%;
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            border-radius: var(--nm-radius);
+            padding: 10px;
+            color: var(--nm-text);
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            margin-bottom: 8px;
+            font-family: var(--nm-font);
+        }
+
+        .action-btn:hover {
+            background: var(--nm-surface-hover);
+        }
+
+        .action-btn.primary {
+            background: var(--nm-text);
+            color: var(--nm-bg);
+            border-color: var(--nm-text);
+        }
+
+        .action-btn.primary:hover {
+            background: #e0e0e0;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--nm-text-secondary);
+            padding: 6px 0;
+            font-family: var(--nm-font);
+        }
+
+        .stats-value {
+            color: var(--nm-text);
+            font-weight: 600;
+        }
+
+        select.sm-select {
+            width: 100%;
+            background: var(--nm-bg);
+            border: 1px solid var(--nm-border);
+            border-radius: 6px;
+            padding: 8px;
+            color: var(--nm-text);
+            font-size: 11px;
+            font-family: var(--nm-font);
+            outline: none;
+            cursor: pointer;
+        }
+
+        select.sm-select option {
+            background: var(--nm-bg);
+            color: var(--nm-text);
+        }
+    </style>
+</head>
+<body>
+    <div class="popup-header">
+        <div>
+            <div class="popup-title">Essential Tab</div>
+            <div class="popup-version">v5.0.0</div>
+        </div>
+    </div>
+
+    <!-- Quick Toggles -->
+    <div class="popup-section">
+        <div class="popup-section-title">Quick Toggles</div>
+        <div class="feature-grid">
+            <button class="feature-btn" id="toggleDarkMode" data-feature="dark-mode">
+                <span class="feature-icon">◐</span>
+                <span class="feature-label">Dark</span>
+                <span class="feature-shortcut">Shift+D</span>
+            </button>
+            <button class="feature-btn" id="toggleReadingMode" data-feature="reading-mode">
+                <span class="feature-icon">◑</span>
+                <span class="feature-label">Read</span>
+                <span class="feature-shortcut">Shift+R</span>
+            </button>
+            <button class="feature-btn" id="toggleCommandPalette" data-feature="command-palette">
+                <span class="feature-icon">⌘</span>
+                <span class="feature-label">Commands</span>
+                <span class="feature-shortcut">Shift+K</span>
+            </button>
+            <button class="feature-btn" id="toggleTabManager" data-feature="tab-manager">
+                <span class="feature-icon">⊞</span>
+                <span class="feature-label">Tabs</span>
+                <span class="feature-shortcut">Shift+T</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Dark Mode Settings -->
+    <div class="popup-section">
+        <div class="popup-section-title">Dark Mode</div>
+        <div class="slider-section">
+            <div class="slider-header">
+                <span class="slider-label">Brightness</span>
+                <span class="slider-value" id="brightnessValue">100%</span>
+            </div>
+            <input type="range" class="slider" id="brightnessSlider" min="50" max="120" value="100">
+        </div>
+        <div class="slider-section">
+            <div class="slider-header">
+                <span class="slider-label">Contrast</span>
+                <span class="slider-value" id="contrastValue">100%</span>
+            </div>
+            <input type="range" class="slider" id="contrastSlider" min="70" max="130" value="100">
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Reading Mode Settings -->
+    <div class="popup-section">
+        <div class="popup-section-title">Reading Mode</div>
+        <div class="slider-section">
+            <div class="slider-header">
+                <span class="slider-label">Font Size</span>
+                <span class="slider-value" id="fontSizeValue">18px</span>
+            </div>
+            <input type="range" class="slider" id="fontSizeSlider" min="14" max="28" value="18">
+        </div>
+        <div class="slider-section">
+            <div class="slider-header">
+                <span class="slider-label">Line Height</span>
+                <span class="slider-value" id="lineHeightValue">1.8</span>
+            </div>
+            <input type="range" class="slider" id="lineHeightSlider" min="1.2" max="2.5" step="0.1" value="1.8">
+        </div>
+        <div class="slider-section">
+            <div class="slider-header">
+                <span class="slider-label">Font</span>
+            </div>
+            <select id="fontFamilySelect" class="sm-select">
+                <option value="Georgia, serif">Georgia</option>
+                <option value="'Times New Roman', serif">Times</option>
+                <option value="-apple-system, sans-serif">System</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="'Courier New', monospace">Mono</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Actions -->
+    <div class="popup-section">
+        <button class="action-btn primary" id="openSessions">
+            <span>⊞</span> Sessions
+        </button>
+        <button class="action-btn" id="openDashboard">
+            <span>◎</span> Dashboard
+        </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <span>Tabs</span>
+        <span class="stats-value" id="tabCount">0</span>
+    </div>
+    <div class="stats-row">
+        <span>Windows</span>
+        <span class="stats-value" id="windowCount">0</span>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
+

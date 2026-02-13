@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitor</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --nm-bg: #000000;
+            --nm-surface: #1a1a1a;
+            --nm-surface-hover: #2a2a2a;
+            --nm-border: #333333;
+            --nm-text: #ffffff;
+            --nm-text-secondary: #888888;
+            --nm-font: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .system-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2147483647;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--nm-font);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .system-overlay.active { display: flex; }
+
+        .system-modal {
+            width: 360px;
+            background: var(--nm-bg);
+            border: 1px solid var(--nm-border);
+            border-radius: 16px;
+            overflow: hidden;
+            animation: sys-enter 0.2s ease;
+        }
+
+        @keyframes sys-enter {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .sys-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--nm-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sys-title {
+            font-family: 'NDOT', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--nm-text);
+        }
+
+        .sys-close {
+            background: none;
+            border: none;
+            color: var(--nm-text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            font-family: var(--nm-font);
+        }
+
+        .sys-content {
+            padding: 24px;
+        }
+
+        .sys-metric {
+            margin-bottom: 20px;
+        }
+
+        .sys-metric:last-child { margin-bottom: 0; }
+
+        .sys-metric-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .sys-metric-label {
+            font-size: 11px;
+            color: var(--nm-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sys-metric-value {
+            font-size: 11px;
+            color: var(--nm-text);
+            font-family: var(--nm-font);
+        }
+
+        .sys-bar {
+            height: 6px;
+            background: var(--nm-surface);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .sys-bar-fill {
+            height: 100%;
+            background: var(--nm-text);
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .sys-info {
+            padding: 16px 24px;
+            border-top: 1px solid var(--nm-border);
+            font-size: 10px;
+            color: var(--nm-text-secondary);
+            font-family: var(--nm-font);
+        }
+
+        .sys-info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+
+        .sys-info-row:last-child { margin-bottom: 0; }
+    </style>
+</head>
+<body>
+    <div class="system-overlay" id="sysOverlay">
+        <div class="system-modal">
+            <div class="sys-header">
+                <div class="sys-title">SYSTEM</div>
+                <button class="sys-close" id="sysClose">×</button>
+            </div>
+            <div class="sys-content">
+                <div class="sys-metric">
+                    <div class="sys-metric-header">
+                        <span class="sys-metric-label">MEMORY</span>
+                        <span class="sys-metric-value" id="memValue">--</span>
+                    </div>
+                    <div class="sys-bar">
+                        <div class="sys-bar-fill" id="memBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="sys-metric">
+                    <div class="sys-metric-header">
+                        <span class="sys-metric-label">CPU LOAD</span>
+                        <span class="sys-metric-value" id="cpuValue">--</span>
+                    </div>
+                    <div class="sys-bar">
+                        <div class="sys-bar-fill" id="cpuBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="sys-metric">
+                    <div class="sys-metric-header">
+                        <span class="sys-metric-label">BATTERY</span>
+                        <span class="sys-metric-value" id="battValue">--</span>
+                    </div>
+                    <div class="sys-bar">
+                        <div class="sys-bar-fill" id="battBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="sys-info">
+                <div class="sys-info-row">
+                    <span>OS</span>
+                    <span id="sysOs">--</span>
+                </div>
+                <div class="sys-info-row">
+                    <span>UPTIME</span>
+                    <span id="sysUptime">--</span>
+                </div>
+                <div class="sys-info-row">
+                    <span>RESOLUTION</span>
+                    <span id="sysRes">--</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="widgets/system.js"></script>
+</body>
+</html>

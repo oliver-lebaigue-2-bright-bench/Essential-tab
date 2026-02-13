@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --nm-bg: #000000;
+            --nm-surface: #1a1a1a;
+            --nm-surface-hover: #2a2a2a;
+            --nm-border: #333333;
+            --nm-text: #ffffff;
+            --nm-text-secondary: #888888;
+            --nm-font: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .qr-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2147483647;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--nm-font);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .qr-overlay.active { display: flex; }
+
+        .qr-modal {
+            width: 400px;
+            max-width: 90vw;
+            background: var(--nm-bg);
+            border: 1px solid var(--nm-border);
+            border-radius: 16px;
+            overflow: hidden;
+            animation: qr-enter 0.2s ease;
+        }
+
+        @keyframes qr-enter {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .qr-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--nm-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .qr-title {
+            font-family: 'NDOT', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--nm-text);
+        }
+
+        .qr-close {
+            background: none;
+            border: none;
+            color: var(--nm-text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            font-family: var(--nm-font);
+        }
+
+        .qr-content { padding: 24px; }
+
+        .qr-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .qr-tab {
+            flex: 1;
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            color: var(--nm-text-secondary);
+            padding: 12px;
+            border-radius: 8px;
+            font-family: var(--nm-font);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .qr-tab:hover {
+            background: var(--nm-surface-hover);
+            color: var(--nm-text);
+        }
+
+        .qr-tab.active {
+            background: var(--nm-text);
+            color: var(--nm-bg);
+            border-color: var(--nm-text);
+        }
+
+        .qr-input {
+            width: 100%;
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            border-radius: 8px;
+            padding: 14px 16px;
+            color: var(--nm-text);
+            font-family: 'NTYPE', sans-serif;
+            font-size: 14px;
+            outline: none;
+            resize: none;
+        }
+
+        .qr-input:focus { border-color: var(--nm-text); }
+
+        .qr-current-url {
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: var(--nm-font);
+            font-size: 10px;
+            color: var(--nm-text-secondary);
+            margin-bottom: 12px;
+            word-break: break-all;
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .qr-btn {
+            flex: 1;
+            background: var(--nm-text);
+            color: var(--nm-bg);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: var(--nm-font);
+            font-size: 11px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .qr-btn:hover { background: #e0e0e0; }
+
+        .qr-result {
+            text-align: center;
+            padding: 20px;
+            background: var(--nm-surface);
+            border-radius: 12px;
+            border: 1px solid var(--nm-border);
+        }
+
+        .qr-canvas {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            display: inline-block;
+        }
+
+        .qr-actions-row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .qr-save-btn {
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            color: var(--nm-text);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-family: var(--nm-font);
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .qr-save-btn:hover {
+            background: var(--nm-surface-hover);
+        }
+
+        .qr-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--nm-text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="qr-overlay" id="qrOverlay">
+        <div class="qr-modal">
+            <div class="qr-header">
+                <div class="qr-title">QR CODE</div>
+                <button class="qr-close" id="qrClose">×</button>
+            </div>
+            <div class="qr-content">
+                <div class="qr-tabs">
+                    <button class="qr-tab active" data-tab="text">TEXT</button>
+                    <button class="qr-tab" data-tab="url">URL</button>
+                </div>
+                <div id="qrTextSection">
+                    <textarea class="qr-input" id="qrTextInput" placeholder="Enter text..." rows="3"></textarea>
+                </div>
+                <div id="qrUrlSection" style="display:none;">
+                    <div class="qr-current-url" id="qrCurrentUrl">Loading...</div>
+                </div>
+                <div class="qr-actions">
+                    <button class="qr-btn" id="qrGenerateBtn">GENERATE</button>
+                </div>
+                <div class="qr-result" id="qrResult">
+                    <div class="qr-empty">Enter text and tap Generate</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="widgets/qrcode.js"></script>
+</body>
+</html>

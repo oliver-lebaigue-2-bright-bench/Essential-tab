@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --nm-bg: #000000;
+            --nm-surface: #1a1a1a;
+            --nm-surface-hover: #2a2a2a;
+            --nm-border: #333333;
+            --nm-text: #ffffff;
+            --nm-text-secondary: #888888;
+            --nm-font: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .clipboard-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2147483647;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--nm-font);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .clipboard-overlay.active {
+            display: flex;
+        }
+
+        .clipboard-modal {
+            width: 480px;
+            max-height: 80vh;
+            background: var(--nm-bg);
+            border: 1px solid var(--nm-border);
+            border-radius: 16px;
+            overflow: hidden;
+            animation: clip-enter 0.2s ease;
+        }
+
+        @keyframes clip-enter {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .clip-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--nm-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clip-title {
+            font-family: 'NDOT', sans-serif;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--nm-text);
+        }
+
+        .clip-close {
+            background: none;
+            border: none;
+            color: var(--nm-text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            font-family: var(--nm-font);
+        }
+
+        .clip-close:hover {
+            color: var(--nm-text);
+        }
+
+        .clip-search {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--nm-border);
+        }
+
+        .clip-search input {
+            width: 100%;
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--nm-text);
+            font-family: var(--nm-font);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .clip-search input:focus {
+            border-color: var(--nm-text);
+        }
+
+        .clip-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .clip-empty {
+            padding: 40px 24px;
+            text-align: center;
+            color: var(--nm-text-secondary);
+            font-size: 12px;
+        }
+
+        .clip-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .clip-item:hover {
+            background: var(--nm-surface-hover);
+        }
+
+        .clip-pinned {
+            background: var(--nm-surface);
+        }
+
+        .clip-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .clip-text {
+            font-size: 12px;
+            color: var(--nm-text);
+            line-height: 1.5;
+            word-break: break-word;
+            max-height: 60px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .clip-meta {
+            font-size: 10px;
+            color: var(--nm-text-secondary);
+            margin-top: 6px;
+            font-family: var(--nm-font);
+        }
+
+        .clip-actions {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .clip-item:hover .clip-actions {
+            opacity: 1;
+        }
+
+        .clip-btn {
+            background: var(--nm-surface);
+            border: none;
+            color: var(--nm-text-secondary);
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-family: var(--nm-font);
+            transition: all 0.2s;
+        }
+
+        .clip-btn:hover {
+            background: var(--nm-border);
+            color: var(--nm-text);
+        }
+
+        .clip-btn.pin:hover {
+            color: var(--nm-text);
+        }
+
+        .clip-btn.delete:hover {
+            background: rgba(220, 38, 38, 0.2);
+            color: #ff4444;
+        }
+
+        .clip-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--nm-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clip-count {
+            font-size: 10px;
+            color: var(--nm-text-secondary);
+            font-family: var(--nm-font);
+        }
+
+        .clip-clear {
+            background: none;
+            border: none;
+            color: var(--nm-text-secondary);
+            font-size: 10px;
+            cursor: pointer;
+            font-family: var(--nm-font);
+        }
+
+        .clip-clear:hover {
+            color: #ff4444;
+        }
+
+        /* Scrollbar */
+        .clip-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .clip-list::-webkit-scrollbar-track {
+            background: var(--nm-bg);
+        }
+
+        .clip-list::-webkit-scrollbar-thumb {
+            background: var(--nm-border);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="clipboard-overlay" id="clipOverlay">
+        <div class="clipboard-modal">
+            <div class="clip-header">
+                <div class="clip-title">CLIPBOARD</div>
+                <button class="clip-close" id="clipClose">×</button>
+            </div>
+            <div class="clip-search">
+                <input type="text" id="clipSearch" placeholder="Search clipboard..." autocomplete="off">
+            </div>
+            <div class="clip-list" id="clipList">
+                <div class="clip-empty">No clipboard history yet</div>
+            </div>
+            <div class="clip-footer">
+                <span class="clip-count" id="clipCount">0 items</span>
+                <button class="clip-clear" id="clipClear">CLEAR ALL</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="widgets/clipboard.js"></script>
+</body>
+</html>

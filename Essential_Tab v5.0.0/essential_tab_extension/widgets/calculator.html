@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --nm-bg: #000000;
+            --nm-surface: #1a1a1a;
+            --nm-surface-hover: #2a2a2a;
+            --nm-border: #333333;
+            --nm-text: #ffffff;
+            --nm-text-secondary: #888888;
+            --nm-font: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .calculator-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2147483647;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 15vh;
+            font-family: var(--nm-font);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .calculator-overlay.active {
+            display: flex;
+        }
+
+        .calculator-modal {
+            width: 320px;
+            background: var(--nm-bg);
+            border: 1px solid var(--nm-border);
+            border-radius: 16px;
+            overflow: hidden;
+            animation: calc-enter 0.2s ease;
+        }
+
+        @keyframes calc-enter {
+            from { opacity: 0; transform: scale(0.95) translateY(-20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .calc-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--nm-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .calc-title {
+            font-family: 'NDOT', sans-serif;
+            font-size: 12px;
+            color: var(--nm-text);
+            letter-spacing: 2px;
+        }
+
+        .calc-close {
+            background: none;
+            border: none;
+            color: var(--nm-text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 4px;
+            font-family: var(--nm-font);
+        }
+
+        .calc-close:hover {
+            color: var(--nm-text);
+        }
+
+        .calc-display {
+            padding: 20px;
+            text-align: right;
+        }
+
+        .calc-expression {
+            font-size: 12px;
+            color: var(--nm-text-secondary);
+            min-height: 16px;
+            word-break: break-all;
+            font-family: var(--nm-font);
+        }
+
+        .calc-result {
+            font-size: 36px;
+            color: var(--nm-text);
+            font-weight: 600;
+            font-family: 'NTYPE', sans-serif;
+            word-break: break-all;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--nm-border);
+            padding: 1px;
+        }
+
+        .calc-btn {
+            padding: 16px;
+            border: none;
+            background: var(--nm-surface);
+            color: var(--nm-text);
+            font-size: 18px;
+            font-family: var(--nm-font);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .calc-btn:hover {
+            background: var(--nm-surface-hover);
+        }
+
+        .calc-btn:active {
+            background: var(--nm-border);
+        }
+
+        .calc-btn.operator {
+            background: var(--nm-surface-hover);
+            font-weight: 600;
+        }
+
+        .calc-btn.equals {
+            background: var(--nm-text);
+            color: var(--nm-bg);
+        }
+
+        .calc-btn.equals:hover {
+            background: #e0e0e0;
+        }
+
+        .calc-footer {
+            padding: 12px 20px;
+            border-top: 1px solid var(--nm-border);
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--nm-text-secondary);
+            font-family: var(--nm-font);
+        }
+
+        .calc-history-toggle {
+            background: none;
+            border: none;
+            color: var(--nm-text-secondary);
+            cursor: pointer;
+            font-family: var(--nm-font);
+            font-size: 10px;
+        }
+
+        .calc-history-toggle:hover {
+            color: var(--nm-text);
+        }
+
+        .calc-history {
+            max-height: 150px;
+            overflow-y: auto;
+            padding: 10px 20px;
+            border-top: 1px solid var(--nm-border);
+            display: none;
+        }
+
+        .calc-history.active {
+            display: block;
+        }
+
+        .calc-history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--nm-border);
+            font-size: 12px;
+            font-family: var(--nm-font);
+            cursor: pointer;
+        }
+
+        .calc-history-item:hover {
+            color: var(--nm-text-secondary);
+        }
+
+        .calc-history-result {
+            color: var(--nm-text);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-overlay" id="calcOverlay">
+        <div class="calculator-modal">
+            <div class="calc-header">
+                <div class="calc-title">CALCULATOR</div>
+                <button class="calc-close" id="calcClose">×</button>
+            </div>
+            <div class="calc-display">
+                <div class="calc-expression" id="calcExpression"></div>
+                <div class="calc-result" id="calcResult">0</div>
+            </div>
+            <div class="calc-history" id="calcHistory"></div>
+            <div class="calc-buttons">
+                <button class="calc-btn" data-action="clear">AC</button>
+                <button class="calc-btn" data-action="negate">±</button>
+                <button class="calc-btn" data-action="percent">%</button>
+                <button class="calc-btn operator" data-action="divide">÷</button>
+                
+                <button class="calc-btn" data-value="7">7</button>
+                <button class="calc-btn" data-value="8">8</button>
+                <button class="calc-btn" data-value="9">9</button>
+                <button class="calc-btn operator" data-action="multiply">×</button>
+                
+                <button class="calc-btn" data-value="4">4</button>
+                <button class="calc-btn" data-value="5">5</button>
+                <button class="calc-btn" data-value="6">6</button>
+                <button class="calc-btn operator" data-action="subtract">−</button>
+                
+                <button class="calc-btn" data-value="1">1</button>
+                <button class="calc-btn" data-value="2">2</button>
+                <button class="calc-btn" data-value="3">3</button>
+                <button class="calc-btn operator" data-action="add">+</button>
+                
+                <button class="calc-btn" data-action="backspace">⌫</button>
+                <button class="calc-btn" data-value="0">0</button>
+                <button class="calc-btn" data-value=".">.</button>
+                <button class="calc-btn equals" data-action="equals">=</button>
+            </div>
+            <div class="calc-footer">
+                <span>KEYBOARD SUPPORT</span>
+                <button class="calc-history-toggle" id="toggleHistory">HISTORY</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="widgets/calculator.js"></script>
+</body>
+</html>

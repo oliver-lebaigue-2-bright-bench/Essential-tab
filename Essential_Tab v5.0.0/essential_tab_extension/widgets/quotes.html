@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Quote</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --nm-bg: #000000;
+            --nm-surface: #1a1a1a;
+            --nm-surface-hover: #2a2a2a;
+            --nm-border: #333333;
+            --nm-text: #ffffff;
+            --nm-text-secondary: #888888;
+            --nm-font: 'SF Mono', 'Monaco', 'Consolas', monospace;
+        }
+
+        .quote-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 2147483647;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--nm-font);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        .quote-overlay.active {
+            display: flex;
+        }
+
+        .quote-modal {
+            width: 480px;
+            max-width: 90vw;
+            background: var(--nm-bg);
+            border: 1px solid var(--nm-border);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            animation: quote-enter 0.3s ease;
+        }
+
+        @keyframes quote-enter {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .quote-header {
+            margin-bottom: 32px;
+        }
+
+        .quote-brand {
+            font-family: 'NDOT', sans-serif;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: var(--nm-text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .quote-icon {
+            font-size: 32px;
+            margin-bottom: 16px;
+            opacity: 0.6;
+        }
+
+        .quote-content {
+            margin-bottom: 32px;
+        }
+
+        .quote-text {
+            font-family: 'NTYPE', sans-serif;
+            font-size: 22px;
+            line-height: 1.6;
+            color: var(--nm-text);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .quote-author {
+            font-family: var(--nm-font);
+            font-size: 12px;
+            color: var(--nm-text-secondary);
+            letter-spacing: 1px;
+        }
+
+        .quote-author::before {
+            content: '— ';
+        }
+
+        .quote-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--nm-border);
+        }
+
+        .quote-btn {
+            background: var(--nm-surface);
+            border: 1px solid var(--nm-border);
+            color: var(--nm-text);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: var(--nm-font);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quote-btn:hover {
+            background: var(--nm-surface-hover);
+            border-color: var(--nm-text-secondary);
+        }
+
+        .quote-btn.primary {
+            background: var(--nm-text);
+            color: var(--nm-bg);
+            border-color: var(--nm-text);
+        }
+
+        .quote-btn.primary:hover {
+            background: #e0e0e0;
+        }
+
+        .quote-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--nm-text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            font-family: var(--nm-font);
+        }
+
+        .quote-close:hover {
+            color: var(--nm-text);
+        }
+    </style>
+</head>
+<body>
+    <div class="quote-overlay" id="quoteOverlay">
+        <button class="quote-close" id="quoteClose">×</button>
+        <div class="quote-modal">
+            <div class="quote-header">
+                <div class="quote-brand">ESSENTIAL TAB</div>
+                <div class="quote-icon">"</div>
+            </div>
+            <div class="quote-content">
+                <div class="quote-text" id="quoteText">Loading quote...</div>
+                <div class="quote-author" id="quoteAuthor"></div>
+            </div>
+            <div class="quote-actions">
+                <button class="quote-btn" id="quoteCopy">
+                    <span>⊛</span> COPY
+                </button>
+                <button class="quote-btn" id="quoteShare">
+                    <span>⊕</span> SAVE TO NOTES
+                </button>
+                <button class="quote-btn primary" id="quoteNew">
+                    <span>↻</span> NEW QUOTE
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="widgets/quotes.js"></script>
+</body>
+</html>

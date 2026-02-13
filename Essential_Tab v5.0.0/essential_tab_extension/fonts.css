@@ -1,0 +1,33 @@
+/* Nothing Design Font Faces */
+/* These fonts are used throughout the Essential Tab extension for the signature Nothing Design aesthetic */
+
+@font-face {
+    font-family: 'NDOT';
+    src: url('lib/NDOT.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'NTYPE';
+    src: url('lib/NTYPE.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Font usage classes */
+.ndot-font {
+    font-family: 'NDOT', 'Space Mono', monospace;
+}
+
+.ntype-font {
+    font-family: 'NTYPE', 'Inter', -apple-system, sans-serif;
+}
+
+/* Update root variables to use Nothing fonts */
+:root {
+    --font-display: 'NDOT', 'Space Mono', monospace;
+    --font-ui: 'NTYPE', 'Inter', -apple-system, sans-serif;
+}
